@@ -1,0 +1,15 @@
+{
+  "_comment": "Solution 2 site file. Replace every lat/lon with YOUR surveyed values. Check the packet lengths printed by tdoa_wifi_process.py on your first capture and correct ref_packet_us / tgt_packet_us if needed.",
+  "sample_rate": 20000000,
+  "rx_center_hz": 2437000000,
+  "ref_packet_us": 640,
+  "tgt_packet_us": 1800,
+  "packet_tolerance_us": 80,
+  "nodes": {
+    "node1": {"lat": 33.0000000, "lon": 73.0000000},
+    "node2": {"lat": 33.0002700, "lon": 73.0029000},
+    "node3": {"lat": 33.0021600, "lon": 73.0011800}
+  },
+  "reference": {"lat": 33.0025200, "lon": 72.9982800},
+  "truth_target": {"lat": 33.0008600, "lon": 73.0013400}
+}
