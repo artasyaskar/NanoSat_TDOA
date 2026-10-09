@@ -1,0 +1,30 @@
+{
+  "sample_rate": 2400000,
+  "rx_center_hz": 433920000,
+  "ref_signal_hz": 433350000,
+  "target_signal_hz": 434490000,
+  "band_hz": 600000,
+  "cfo_margin_hz": 25000,
+  "nodes": {
+    "node1": {
+      "lat": 33.0,
+      "lon": 73.0
+    },
+    "node2": {
+      "lat": 33.0002705,
+      "lon": 73.0028896
+    },
+    "node3": {
+      "lat": 33.002164,
+      "lon": 73.0011772
+    }
+  },
+  "reference": {
+    "lat": 33.0025247,
+    "lon": 72.9982876
+  },
+  "truth_target": {
+    "lat": 33.0008566,
+    "lon": 73.0013378
+  }
+}
