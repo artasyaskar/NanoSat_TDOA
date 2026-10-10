@@ -1,0 +1,11 @@
+{
+  "station_id": "node2",
+  "hardware_model": "RTL-SDR Blog V3",
+  "tuner_type": "R820T2",
+  "slot_utc_str": "20261016_120000 UTC",
+  "center_freq_hz": 433920000,
+  "sample_rate_sps": 2400000,
+  "cal_delay_offset_ns": 0.0,
+  "bytes_recorded": 9600000,
+  "sha256": "7e5cff047f32c90927cf74f44d8644c5dcd0803dca829b91dcf0ead3499959d1"
+}
