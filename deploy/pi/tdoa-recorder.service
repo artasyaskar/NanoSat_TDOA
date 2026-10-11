@@ -1,0 +1,17 @@
+[Unit]
+Description=TDOA Autonomous Receiver Capture Daemon
+After=network.target chrony.service
+Wants=chrony.service
+
+[Service]
+Type=simple
+User=resolve
+WorkingDirectory=/home/resolve/tdoa
+ExecStart=/usr/bin/python3 /home/resolve/tdoa/station_daemon.py --config /home/resolve/tdoa/station_config.json
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
