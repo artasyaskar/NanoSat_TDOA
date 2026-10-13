@@ -1,0 +1,65 @@
+{
+  "site_name": "Synthetic Simulation & Lab Calibration Site",
+  "sample_rate": 2400000,
+  "rx_center_hz": 433920000,
+  "ref_signal_hz": 433350000,
+  "target_signal_hz": 434490000,
+  "band_hz": 600000,
+  "cfo_margin_hz": 25000,
+  "nodes": {
+    "node1": {
+      "lat": 33.0000000,
+      "lon": 73.0000000,
+      "height_m": 2.0,
+      "ip": "192.168.5.248",
+      "tuner": "R820T2"
+    },
+    "node2": {
+      "lat": 33.0002700,
+      "lon": 73.0029000,
+      "height_m": 2.0,
+      "ip": "192.168.5.249",
+      "tuner": "R820T2"
+    },
+    "node3": {
+      "lat": 33.0021600,
+      "lon": 73.0011800,
+      "height_m": 2.0,
+      "ip": "192.168.5.250",
+      "tuner": "R828D"
+    }
+  },
+  "chromatic_cal_matrix": {
+    "node1": {
+      "tuner_type": "R820T2",
+      "dongle_version": "RTL-SDR Blog V3",
+      "chromatic_delay_ns": 0.0,
+      "temp_coeff_ps_per_c": 1.2,
+      "ref_temp_c": 45.0
+    },
+    "node2": {
+      "tuner_type": "R820T2",
+      "dongle_version": "RTL-SDR Blog V3",
+      "chromatic_delay_ns": 0.0,
+      "temp_coeff_ps_per_c": 1.2,
+      "ref_temp_c": 45.0
+    },
+    "node3": {
+      "tuner_type": "R828D",
+      "dongle_version": "RTL-SDR Blog V4",
+      "chromatic_delay_ns": 15.0,
+      "temp_coeff_ps_per_c": 2.5,
+      "ref_temp_c": 48.0
+    }
+  },
+  "reference": {
+    "lat": 33.0025200,
+    "lon": 72.9982800,
+    "height_m": 2.5
+  },
+  "truth_target": {
+    "lat": 33.0008600,
+    "lon": 73.0013400,
+    "height_m": 2.0
+  }
+}
