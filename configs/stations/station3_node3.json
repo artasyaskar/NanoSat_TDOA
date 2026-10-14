@@ -1,0 +1,18 @@
+{
+  "station_id": "node3",
+  "station_ip": "192.168.5.222",
+  "hardware_model": "Raspberry Pi 4 + RTL-SDR Blog V4",
+  "tuner_type": "R828D",
+  "serial_number": "00000003",
+  "center_freq_hz": 433920000,
+  "sample_rate_sps": 2400000,
+  "tuner_gain_db": 30.0,
+  "ppm_correction": 0,
+  "cal_delay_offset_ns": 15.0,
+  "cal_note": "R828D internal triplexer/upconverter chromatic dispersion across 1.14 MHz span (+15.00 ns nominal)",
+  "capture_duration_s": 2.0,
+  "capture_interval_s": 30,
+  "ramdisk_dir": "/dev/shm",
+  "capture_dir": "~/tdoa/captures",
+  "central_server_url": "http://192.168.5.1:8080/api/telemetry"
+}
