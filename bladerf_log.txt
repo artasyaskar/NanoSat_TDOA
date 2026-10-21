@@ -1,0 +1,7 @@
+[WARNING @ host/libraries/libbladeRF/src/backend/usb/libusb.c:530] Found a bladeRF via VID/PID, but could not open it due to insufficient permissions.
+
+No bladeRF device(s) available.
+
+If one is attached, ensure it is not in use by another program
+and that the current user has permission to access it.
+
