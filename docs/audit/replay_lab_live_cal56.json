@@ -1,0 +1,163 @@
+{
+  "generated_utc": "2026-10-22T17:01:38Z",
+  "result": {
+    "data_source": "REPLAY",
+    "slot": "lab_live",
+    "algo": "adra",
+    "status": "NO_FIX",
+    "reason": "TOO_FEW_PAIRS (1 usable, need >= 2)",
+    "params": {
+      "seg_ms": 10.0,
+      "nseg": 60,
+      "min_quality": 8.0,
+      "max_seconds": null,
+      "apply_cal": true,
+      "bench": false,
+      "closure_limit_m": 2.5,
+      "strict_closure": true,
+      "scan_segments": 12
+    },
+    "geometry": {
+      "source": "config:config_lab.json",
+      "node_xy": {
+        "node1": [
+          -4.295063624866988,
+          -1.2828037214870578
+        ],
+        "node2": [
+          3.7313170588100664,
+          -1.2828037214870578
+        ],
+        "node3": [
+          0.5637465673847648,
+          2.5656074437621443
+        ]
+      },
+      "ref_xy": [
+        -2.202037695202438,
+        -0.6506439620677604
+      ],
+      "truth_xy": [
+        -1.9310655884621974,
+        -0.5064671755783341
+      ],
+      "cal_matrix_ns": {
+        "node1": 0.0,
+        "node2": 0.0,
+        "node3": 56.3
+      }
+    },
+    "files": {
+      "node1": {
+        "name": "node1_lab_live.cu8",
+        "bytes": 19200000,
+        "sha256": "cc32da3ddfcb1f4ea592626997a82b8a11dd0384dd859c7df0280e2c3eda15c7"
+      },
+      "node2": {
+        "name": "node2_lab_live.cu8",
+        "bytes": 19200000,
+        "sha256": "e2102551cd14c1b1f1990a79abed48025374c441e1ca2e3e8c4277b7aef7cad5"
+      },
+      "node3": {
+        "name": "node3_lab_live.cu8",
+        "bytes": 19200000,
+        "sha256": "3ee85221d1a4476b426a8676eb14b81a6b59d98a45d2aa705d2327e9e566f5ce"
+      }
+    },
+    "nodes": {
+      "node1": {
+        "n_samples": 9600000,
+        "cfo_hz": 29685.965837898144,
+        "cfo_ppm": 68.41345371934491,
+        "cfo_tone_snr_db": 13.906287927322602,
+        "ref_power_db": -27.472049713134766,
+        "target_power_db": -33.20150375366211,
+        "clipping_pct": 0.0
+      },
+      "node2": {
+        "n_samples": 9600000,
+        "cfo_hz": 29725.16441654526,
+        "cfo_ppm": 68.50378967677281,
+        "cfo_tone_snr_db": 11.307949546603222,
+        "ref_power_db": -34.19477462768555,
+        "target_power_db": -40.66950988769531,
+        "clipping_pct": 0.0
+      },
+      "node3": {
+        "n_samples": 9600000,
+        "cfo_hz": 27353.642871992124,
+        "cfo_ppm": 63.03844688420014,
+        "cfo_tone_snr_db": 14.273947525365006,
+        "ref_power_db": -25.768558502197266,
+        "target_power_db": -39.52571487426758,
+        "clipping_pct": 0.0
+      }
+    },
+    "pairs": [
+      {
+        "pair": "node1-node2",
+        "status": "FAILED",
+        "reason": "NO_GOOD_SEGMENTS (reference/target quality below threshold in every piece)",
+        "baseline_m": 8.026380683677054,
+        "min_quality_threshold": 8.0,
+        "coarse_ref_quality": 88.47869873046875,
+        "good_segments": 0,
+        "coarse_ref_lag_samples": 8615.0,
+        "quality_scan": {
+          "n_scan": 12,
+          "ref_quality_median": 26.33036518096924,
+          "ref_quality_min": 23.966339111328125,
+          "target_quality_median": 2.91884708404541,
+          "target_quality_p10": 2.069143772125244,
+          "target_quality_max": 4.482327461242676
+        }
+      },
+      {
+        "pair": "node1-node3",
+        "status": "FAILED",
+        "reason": "NO_GOOD_SEGMENTS (reference/target quality below threshold in every piece)",
+        "baseline_m": 6.198250154773059,
+        "min_quality_threshold": 8.0,
+        "coarse_ref_quality": 42.7067756652832,
+        "good_segments": 0,
+        "coarse_ref_lag_samples": -116258.0,
+        "quality_scan": {
+          "n_scan": 12,
+          "ref_quality_median": 26.644965171813965,
+          "ref_quality_min": 19.896099090576172,
+          "target_quality_median": 2.6011968851089478,
+          "target_quality_p10": 2.110836124420166,
+          "target_quality_max": 2.9058899879455566
+        }
+      },
+      {
+        "pair": "node2-node3",
+        "status": "OK",
+        "reason": null,
+        "baseline_m": 4.98435264753238,
+        "min_quality_threshold": 8.0,
+        "coarse_ref_quality": 105.53202819824219,
+        "good_segments": 43,
+        "coarse_ref_lag_samples": -124873.0,
+        "quality_scan": {
+          "n_scan": 12,
+          "ref_quality_median": 27.65295124053955,
+          "ref_quality_min": 22.439050674438477,
+          "target_quality_median": 14.866057395935059,
+          "target_quality_p10": 13.219275951385498,
+          "target_quality_max": 17.774999618530273
+        },
+        "d_raw_ns": 43.836411417172016,
+        "cal_offset_ns": 56.300000000000004,
+        "d_corrected_ns": -12.463588582827985,
+        "ref_geom_ns": -5.754053335481502,
+        "tdoa_ns": -18.217641918309486,
+        "range_diff_m": -5.461511649653836,
+        "spread_m": 3.385989406732878,
+        "drift_ppm": 5.4531,
+        "inlier_ratio": 0.717,
+        "mean_msc": 0.7463
+      }
+    ]
+  }
+}
