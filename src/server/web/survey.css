@@ -1,0 +1,212 @@
+/* survey.css - Styles for Tape Measure Survey Panel in ADRA-TDOA Mission Control */
+
+.tape-survey-container {
+  background: rgba(13, 20, 32, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  font-family: inherit;
+}
+
+.survey-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.survey-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+}
+
+.survey-body {
+  padding: 12px;
+}
+
+.survey-grid-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.3fr;
+  gap: 12px;
+}
+
+.survey-input-col {
+  background: rgba(10, 16, 26, 0.6);
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.survey-input-col h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 4px;
+}
+
+.inp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+}
+
+.inp-row label {
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.inp-row input[type="text"],
+.inp-row input[type="number"] {
+  background: #060911;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  width: 130px;
+  text-align: right;
+}
+
+.inp-row input:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.5);
+}
+
+.survey-btn-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.survey-save-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.survey-save-row input {
+  background: #060911;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+}
+
+.survey-results-card {
+  margin-top: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.survey-res-summary {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.res-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.res-tag.pass {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.res-tag.warn {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.res-tag.fail {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.survey-res-details {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.4;
+  font-family: monospace;
+}
+
+.survey-res-details .coord-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+
+.survey-res-details .coord-table th,
+.survey-res-details .coord-table td {
+  padding: 2px 6px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.survey-res-details .coord-table th {
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Stale & honesty badges */
+.badge-simulated {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid #f59e0b;
+}
+
+.badge-replay {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+}
+
+.badge-live-hw {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.badge-stale {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  animation: blink-stale 1.5s infinite;
+}
+
+@keyframes blink-stale {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
