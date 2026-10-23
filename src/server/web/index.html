@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADRA-TDOA // Defense Tactical Airspace & EW-SIGINT Mission Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Share+Tech+Mono&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="survey.css">
+</head>
+
+<body class="tactical-hud">
+  <!-- Subtle CRT Tactical Scanline Overlay -->
+  <div class="hud-scanline"></div>
+
+  <!-- 1. TOP COMMAND BAR -->
+  <header class="hud-header">
+    <div class="header-branding">
+      <div class="hud-badge">DEFENSE TACTICAL AIRSPACE // EW-SIGINT MULTILATERATION TESTBED // SOLUTION 1 (433.920 MHz)
+      </div>
+      <div class="title-row">
+        <h1 class="hud-title">NanoSat ADRA-TDOA <span>// MISSION CONTROL</span></h1>
+        <span class="novelty-pill">IEEE Q1 NOVEL ENGINE</span>
+      </div>
+    </div>
+
+    <!-- Operational Mode Switcher -->
+    <div class="command-bar-controls">
+      <div class="control-group">
+        <span class="ctrl-label">OPERATIONAL MODE</span>
+        <div class="segmented-switcher" id="mode-switcher">
+          <button class="seg-btn cmd-btn active" data-mode="LIVE_HARDWARE">LIVE STREAM</button>
+          <button class="seg-btn cmd-btn" data-mode="LAB_COAX_BENCH">COAX BENCH CAL</button>
+          <button class="seg-btn cmd-btn" data-mode="URBAN_MULTIPATH">URBAN MP SIM</button>
+          <button class="seg-btn cmd-btn" data-mode="IEEE_ABLATION">IEEE ABLATION</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <span class="ctrl-label">DSP CORRELATION &amp; SOLVER ENGINE</span>
+        <div class="segmented-switcher" id="algo-switcher">
+          <button class="seg-btn algo-btn algo-novel active" data-algo="adra">ADRA-TDOA [NOVEL]</button>
+          <button class="seg-btn algo-btn" data-algo="gcc_phat">GCC-PHAT</button>
+          <button class="seg-btn algo-btn" data-algo="standard">STANDARD XCORR</button>
+        </div>
+      </div>
+
+      <div class="action-buttons-group">
+        <button class="hud-btn primary" id="btn-solve-now" title="Execute immediate TDOA multilateration fix">⌖ SOLVE
+          FIX</button>
+        <button class="hud-btn emerald" id="btn-cal-v4"
+          title="Run Closed-Coaxial Bench Zero-Check & Auto-Calibrate Station 3 V4 (+56.30 ns)">⚡ AUTO-CAL V4</button>
+        <button class="hud-btn amber" id="btn-export-csv" title="Export IEEE Research Paper Benchmark & Ablation CSV">⬇
+          EXPORT CSV</button>
+        <button class="hud-btn sm" id="btn-toggle-density" title="Toggle Compact / Standard HUD Scaling">HUD:
+          100%</button>
+      </div>
+    </div>
+
+    <!-- Live System Clock & Status -->
+    <div class="header-telemetry">
+      <div class="telemetry-block">
+        <span class="label">PASSBAND / Fs</span>
+        <span class="value" id="hdr-freq">433.920 MHz @ 2.4 MS/s</span>
+      </div>
+      <div class="telemetry-block">
+        <span class="label">MISSION CLOCK (UTC)</span>
+        <span class="value utc-clock" id="hdr-utc-clock">--:--:-- UTC</span>
+      </div>
+      <div class="telemetry-block status-block">
+        <span class="label">SYSTEM STATUS</span>
+        <span class="status-indicator online" id="hdr-sys-status">
+          <span class="pulse-dot"></span> <span id="hdr-status-text">LIVE SURVEILLANCE</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification / Calibration Toast Banner -->
+  <div class="cal-notification-banner hidden" id="cal-toast-banner">
+    <span class="toast-icon">✔</span>
+    <span id="cal-toast-text">Station 3 (RTL-SDR V4 R828D) Chromatic Group Delay Auto-Calibrated to +56.30 ns</span>
+    <button class="toast-close" id="btn-close-toast">×</button>
+  </div>
+
+  <!-- 2. MAIN 3-COLUMN TACTICAL COCKPIT GRID -->
+  <main class="hud-grid">
+    <!-- LEFT PANEL: Polar Radar Scope & Blind CFAR SIGINT Threat Table -->
+    <section class="hud-panel panel-radar">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <span class="panel-icon">⌖</span>
+          <h2>POLAR RADAR &amp; DOA VECTORS</h2>
+        </div>
+        <div class="radar-mode-tags">
+          <span class="tag">3-NODE DOA</span>
+          <span class="tag" id="radar-range-tag">RNG: 400m</span>
+        </div>
+      </div>
+
+      <div class="radar-container">
+        <canvas id="polarRadarCanvas" width="280" height="250"></canvas>
+      </div>
+
+      <div class="radar-readouts">
+        <div class="readout-card">
+          <span class="readout-lbl">ARRAY CENTROID AZ</span>
+          <span class="readout-val highlight" id="readout-bearing">035.4°</span>
+        </div>
+        <div class="readout-card">
+          <span class="readout-lbl">TARGET RANGE (S1)</span>
+          <span class="readout-val" id="readout-dist">157.0 m</span>
+        </div>
+        <div class="readout-card">
+          <span class="readout-lbl">S1 / S2 / S3 DOA</span>
+          <span class="readout-val mono-sm" id="readout-doa-all">052.8° / 294.2° / 174.1°</span>
+        </div>
+        <div class="readout-card">
+          <span class="readout-lbl">PAIR 1-3 TDOA LAG</span>
+          <span class="readout-val cyan" id="readout-tdoa-13">-37.45 ns</span>
+        </div>
+      </div>
+
+      <!-- Blind CFAR Unknown Emitter & Multi-Target TWS Table -->
+      <div class="sigint-subsection">
+        <div class="panel-header compact-header">
+          <div class="panel-title-group">
+            <span class="panel-icon">⚡</span>
+            <h3>BLIND CCA-CFAR &amp; SIGINT AMC INTERCEPTS (TWS)</h3>
+          </div>
+          <span class="tag emerald" id="sigint-count-tag">3 ACTIVE TRACKS</span>
+        </div>
+        <div class="sigint-table-wrap">
+          <table class="tactical-table" id="tws-threat-table">
+            <thead>
+              <tr>
+                <th>TRACK ID</th>
+                <th>FREQ / OFFSET</th>
+                <th>AMC MODULATION</th>
+                <th>SNR</th>
+                <th>AZ / RNG</th>
+                <th>CONF</th>
+              </tr>
+            </thead>
+            <tbody id="tws-tbody">
+              <tr>
+                <td><span class="track-badge hostile">TGT-ALPHA</span></td>
+                <td>434.490M (+570k)</td>
+                <td>BPSK/PRN (RRC)</td>
+                <td>24.8 dB</td>
+                <td>035.4° / 157m</td>
+                <td class="text-emerald">99.2%</td>
+              </tr>
+              <tr>
+                <td><span class="track-badge friendly">REF-PLUTO</span></td>
+                <td>433.350M (-570k)</td>
+                <td>BPSK/PRN (RRC)</td>
+                <td>27.1 dB</td>
+                <td>312.0° / 322m</td>
+                <td class="text-emerald">99.9%</td>
+              </tr>
+              <tr>
+                <td><span class="track-badge bogey">UNK-BOGEY-01</span></td>
+                <td>434.840M (+920k)</td>
+                <td>2-FSK Telemetry</td>
+                <td>14.6 dB</td>
+                <td>049.2° / 283m</td>
+                <td class="text-amber">92.4%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER PANEL: Dual-Mode Tactical Multilateration Map & What-If Geometry Designer -->
+    <section class="hud-panel panel-map">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <span class="panel-icon">⬡</span>
+          <h2>DUAL-MODE TACTICAL MULTILATERATION &amp; GDOP GEOMETRY</h2>
+        </div>
+        <div class="map-controls">
+          <button class="hud-btn active" id="btn-map-cartesian" title="2D Metric Cartesian Grid">2D CARTESIAN</button>
+          <button class="hud-btn" id="btn-map-geodetic" title="WGS84 Geodetic Lat/Lon Sector View">WGS84
+            GEODETIC</button>
+          <span class="divider">|</span>
+          <button class="hud-btn active" id="btn-toggle-hyperbolas">HYPERBOLAS</button>
+          <button class="hud-btn" id="btn-toggle-gdop">GDOP HEATMAP</button>
+          <button class="hud-btn active" id="btn-toggle-ellipse">95% CEP</button>
+          <button class="hud-btn active" id="btn-toggle-ekf">EKF TRAIL</button>
+        </div>
+      </div>
+
+      <!-- Tape Measure Physical Survey Panel -->
+      <div class="tape-survey-container" id="tape-survey-panel">
+        <div class="survey-header" id="survey-toggle-hdr">
+          <div class="survey-title">
+            <span class="survey-icon">📐</span>
+            <strong>INCHI-TAPE PHYSICAL SURVEY SOLVER</strong>
+            <span class="res-tag" id="survey-status-badge">UNINITIALIZED</span>
+          </div>
+          <button class="hud-btn sm" id="btn-toggle-survey-view">COLLAPSE / EXPAND</button>
+        </div>
+        <div class="survey-body" id="survey-body">
+          <div class="survey-grid-inputs">
+            <!-- Inter-Station Baselines -->
+            <div class="survey-input-col">
+              <h4>1. Station Baselines</h4>
+              <div class="inp-row">
+                <label>S1-S2 (Baseline X):</label>
+                <input type="text" id="inp-s1-s2" value="26ft 4in" placeholder="e.g. 8.026 or 26ft 4in">
+              </div>
+              <div class="inp-row">
+                <label>S1-S3:</label>
+                <input type="text" id="inp-s1-s3" value="20ft 4in" placeholder="e.g. 6.198 or 20ft 4in">
+              </div>
+              <div class="inp-row">
+                <label>S2-S3:</label>
+                <input type="text" id="inp-s2-s3" value="16ft 4in" placeholder="e.g. 4.978 or 16ft 4in">
+              </div>
+            </div>
+
+            <!-- Pluto Reference Distances -->
+            <div class="survey-input-col">
+              <h4>2. Pluto Reference TX Distances</h4>
+              <div class="inp-row">
+                <label>P-S1 (Pluto to S1):</label>
+                <input type="text" id="inp-p-s1" value="7ft 2in" placeholder="e.g. 2.184 or 7ft 2in">
+              </div>
+              <div class="inp-row">
+                <label>P-S2 (Pluto to S2):</label>
+                <input type="text" id="inp-p-s2" value="19ft 7in" placeholder="e.g. 5.969 or 19ft 7in">
+              </div>
+              <div class="inp-row">
+                <label>P-S3 (Pluto to S3):</label>
+                <input type="text" id="inp-p-s3" value="4.242 m" placeholder="Measure with tape in lab">
+              </div>
+            </div>
+
+            <!-- Configuration & Actions -->
+            <div class="survey-input-col">
+              <h4>3. Survey Parameters & Actions</h4>
+              <div class="inp-row">
+                <label>Units / Side:</label>
+                <div style="display:flex;gap:4px">
+                  <select id="sel-survey-unit" class="tactical-select sm" style="width:75px">
+                    <option value="m">Metres</option>
+                    <option value="ft_in" selected>Ft/In</option>
+                    <option value="cm">cm</option>
+                  </select>
+                  <select id="sel-survey-side" class="tactical-select sm" style="width:75px">
+                    <option value="1">+Y Side</option>
+                    <option value="-1">-Y Mirror</option>
+                  </select>
+                </div>
+              </div>
+              <div class="inp-row">
+                <label>Tape 1-σ Uncertainty:</label>
+                <input type="number" id="inp-survey-sigma" value="0.02" step="0.005" style="width:75px"> m
+              </div>
+              <div class="survey-btn-row">
+                <button class="hud-btn primary sm" id="btn-survey-preview">⚡ CALCULATE & PREVIEW</button>
+                <button class="hud-btn emerald sm" id="btn-survey-apply" disabled>✔ APPLY TO ARRAY</button>
+                <button class="hud-btn sm" id="btn-survey-revert" style="display:none">↺ REVERT</button>
+              </div>
+              <div class="survey-save-row">
+                <input type="text" id="inp-survey-name" placeholder="survey_name" style="width:95px">
+                <button class="hud-btn sm" id="btn-survey-save" disabled>💾 SAVE</button>
+                <select id="sel-saved-surveys" class="tactical-select sm" style="width:105px"><option value="">Saved...</option></select>
+                <button class="hud-btn sm" id="btn-survey-load">LOAD</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview & Validation Card -->
+          <div class="survey-results-card hidden" id="survey-results-box">
+            <div class="survey-res-summary">
+              <span class="res-tag" id="survey-res-status">STATUS: PASS</span>
+              <span class="res-tag" id="survey-res-rms">PLUTO RESIDUAL RMS: 0.000 m</span>
+              <span class="res-tag" id="survey-res-unc">PLUTO 95% CONFIDENCE: ±0.035 m</span>
+            </div>
+            <div class="survey-res-details" id="survey-res-details"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- What-If Array Geometry Designer Toolbar -->
+      <div class="geometry-designer-bar">
+        <div class="geom-left">
+          <span class="geom-lbl">ARRAY GEOMETRY DESIGNER (DRAG NODES ON MAP):</span>
+          <select id="select-geom-preset" class="tactical-select">
+            <option value="lab_10m">Lab 10-Meter Equilateral Array (Active Hardware)</option>
+            <option value="default">Surveyed Triangle Baseline (~260m) [Optimal GDOP]</option>
+            <option value="wide_500m">Wide Perimeter Triangle (~500m) [Long-Range]</option>
+            <option value="collinear">Collinear Array [GDOP Singularity Warning Demo]</option>
+          </select>
+          <button class="hud-btn sm" id="btn-reset-geom">RESET ARRAY</button>
+        </div>
+        <div class="geom-right">
+          <span class="geom-metric">MIN GDOP: <strong id="map-min-gdop">0.92</strong></span>
+          <span class="geom-metric">TARGET GDOP: <strong id="map-tgt-gdop" class="text-emerald">0.94</strong></span>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <canvas id="tacticalMapCanvas" width="600" height="370"></canvas>
+        <div class="map-overlay-hud">
+          <div class="hud-coord-pill" id="map-cursor-readout">CURSOR: X +0.0m, Y +0.0m | 33.000810°N, 73.001360°E</div>
+          <div class="hud-drag-hint">💡 DRAG S1, S2, S3, REF, OR TARGET TO SIMULATE GEOMETRY</div>
+        </div>
+      </div>
+
+      <!-- Lab Coax Bench Zero-Check Telemetry Strip -->
+      <div class="coax-bench-strip" id="coax-bench-strip">
+        <div class="bench-strip-title">
+          <span class="dot emerald-pulse"></span>
+          <strong>CLOSED-COAXIAL BENCH ZERO-CHECK (Δd_true = 0.00 m):</strong>
+          <span class="bench-topology">Pluto + bladeRF ➔ 2-Way Combiner ➔ <strong>30 dB Attenuator</strong> ➔ 3-Way
+            Splitter ➔ S1/S2/S3</span>
+        </div>
+        <div class="bench-metrics-row">
+          <div class="b-cell">RAW d12 (V3-V3): <strong id="bench-raw-12">+0.04 ns</strong></div>
+          <div class="b-cell">RAW d13 (V3-V4): <strong id="bench-raw-13" class="text-amber">+56.30 ns</strong></div>
+          <div class="b-cell">POST-CAL RES 1-3: <strong id="bench-cal-13" class="text-emerald">+0.01 ns (0.003
+              m)</strong></div>
+          <div class="b-cell">LOOP CLOSURE: <strong id="bench-closure" class="text-emerald">0.010 ns [PASS]</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-legend">
+        <div class="legend-item"><span class="dot station"></span> Receivers S1, S2 (V3), S3 (V4)</div>
+        <div class="legend-item"><span class="dot pluto"></span> Pluto Ref TX (-570 kHz)</div>
+        <div class="legend-item"><span class="dot target"></span> bladeRF Target (+570 kHz)</div>
+        <div class="legend-item"><span class="dot bogey"></span> Blind CFAR Bogey (+920 kHz)</div>
+        <div class="legend-item"><span class="line hyperbola-12"></span> Pair 1-2</div>
+        <div class="legend-item"><span class="line hyperbola-13"></span> Pair 1-3</div>
+        <div class="legend-item"><span class="line hyperbola-23"></span> Pair 2-3</div>
+        <div class="legend-item"><span class="line ellipse"></span> 95% CEP Ellipse</div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Target Telemetry & 3-Tab RF / XCorr / IEEE Benchmark Suite -->
+    <section class="hud-panel panel-analytics">
+      <!-- Target Localization Report -->
+      <div class="sub-panel">
+        <div class="panel-header compact-header">
+          <div class="panel-title-group">
+            <span class="panel-icon">◈</span>
+            <h3>TARGET MULTILATERATION TELEMETRY</h3>
+          </div>
+          <span class="badge-solver" id="badge-solver-type">ADRA-3STAGE (HUBER-IRLS+LM)</span>
+        </div>
+
+        <div class="target-data-grid">
+          <div class="data-cell">
+            <span class="k">ESTIMATED POS (X, Y)</span>
+            <span class="v" id="tgt-xy">X: +125.01 m, Y: +94.99 m</span>
+          </div>
+          <div class="data-cell">
+            <span class="k">GEODETIC (WGS84)</span>
+            <span class="v" id="tgt-latlon">33.000860° N, 73.001340° E</span>
+          </div>
+          <div class="data-cell">
+            <span class="k">FIX ERROR vs TRUTH</span>
+            <span class="v highlight" id="tgt-abs-error">0.042 m (SUB-DECIMETER)</span>
+          </div>
+          <div class="data-cell">
+            <span class="k">HYPERBOLIC RESIDUAL RMS</span>
+            <span class="v" id="tgt-residual">0.0085 m</span>
+          </div>
+          <div class="data-cell">
+            <span class="k">95% CEP ELLIPSE &amp; GDOP</span>
+            <span class="v" id="tgt-cep">a=1.51m, b=1.49m | GDOP 0.94</span>
+          </div>
+          <div class="data-cell">
+            <span class="k">RANSAC DRIFT / V4 CAL</span>
+            <span class="v cyan" id="tgt-drift-cal">+1.07 ppm | S3 V4: +56.30 ns</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Tab Instrumentation Suite -->
+      <div class="sub-panel instrumentation-tabs-panel">
+        <div class="tabs-header">
+          <button class="tab-btn active" data-tab="tab-spectrum">1. SPECTRUM</button>
+          <button class="tab-btn" data-tab="tab-xcorr">2. XCORR ZOOM</button>
+          <button class="tab-btn" data-tab="tab-benchmark">3. IEEE NOVELTY</button>
+        </div>
+
+        <!-- TAB 1: RF Baseband Spectrum + Live Waterfall -->
+        <div class="tab-content active" id="tab-spectrum">
+          <div class="spectrum-container">
+            <canvas id="rfSpectrumCanvas" width="310" height="100"></canvas>
+          </div>
+          <div class="waterfall-container">
+            <canvas id="rfWaterfallCanvas" width="310" height="75"></canvas>
+          </div>
+          <div class="rf-indicators">
+            <span class="rf-badge ref">REF: -570k (Pluto)</span>
+            <span class="rf-badge guard">GUARD: 600k</span>
+            <span class="rf-badge tgt">TGT: +570k (bladeRF)</span>
+            <span class="rf-badge cfar">CCA-CFAR</span>
+          </div>
+        </div>
+
+        <!-- TAB 2: Sub-Sample Cross-Correlation Peak & Multipath Echo Inspector -->
+        <div class="tab-content" id="tab-xcorr">
+          <div class="spectrum-container">
+            <canvas id="xcorrZoomCanvas" width="310" height="135"></canvas>
+          </div>
+          <div class="xcorr-pair-table">
+            <div class="xp-row">
+              <span>PAIR 1-2 (V3-V3):</span>
+              <strong id="xp-lag-12">+6.34 ns (+1.90 m)</strong>
+              <span class="xp-tag">γ²=0.984</span>
+            </div>
+            <div class="xp-row">
+              <span>PAIR 1-3 (V3-V4):</span>
+              <strong id="xp-lag-13">-37.45 ns (-11.23 m)</strong>
+              <span class="xp-tag">V4 Cal -15ns</span>
+            </div>
+            <div class="xp-row">
+              <span>PAIR 2-3 (V3-V4):</span>
+              <strong id="xp-lag-23">-43.79 ns (-13.13 m)</strong>
+              <span class="xp-tag">Early-Gate ON</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: IEEE Paper Novelty Benchmark & Ablation Mode -->
+        <div class="tab-content" id="tab-benchmark">
+          <div class="spectrum-container">
+            <canvas id="benchmarkCanvas" width="310" height="120"></canvas>
+          </div>
+          <div class="benchmark-mini-table-wrap">
+            <table class="tactical-table compact-table">
+              <thead>
+                <tr>
+                  <th>ALGORITHM</th>
+                  <th>LOS RMSE</th>
+                  <th>5ppm SKEW</th>
+                  <th>V4 BIAS</th>
+                  <th>URBAN MP</th>
+                </tr>
+              </thead>
+              <tbody id="benchmark-tbody">
+                <tr>
+                  <td class="text-dim">Standard XCorr</td>
+                  <td>0.18 m</td>
+                  <td>0.61 m</td>
+                  <td>4.52 m</td>
+                  <td class="text-red">8.84 m</td>
+                </tr>
+                <tr>
+                  <td class="text-amber">GCC-PHAT</td>
+                  <td>0.26 m</td>
+                  <td>0.70 m</td>
+                  <td>4.51 m</td>
+                  <td class="text-amber">3.92 m</td>
+                </tr>
+                <tr class="row-highlight">
+                  <td class="text-emerald"><strong>ADRA-TDOA [Ours]</strong></td>
+                  <td class="text-emerald"><strong>0.05 m</strong></td>
+                  <td class="text-emerald"><strong>0.06 m</strong></td>
+                  <td class="text-emerald"><strong>0.02 m</strong></td>
+                  <td class="text-emerald"><strong>0.46 m (+94.8%)</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. BOTTOM DOCK: Raspberry Pi Fleet Telemetry & RF Safety Watchdog -->
+    <section class="hud-panel panel-fleet">
+      <div class="panel-header compact-header">
+        <div class="panel-title-group">
+          <span class="panel-icon">⬢</span>
+          <h2>RASPBERRY PI RECEIVER FLEET TELEMETRY, /dev/shm RAM-DISK &amp; RF SAFETY WATCHDOG</h2>
+        </div>
+        <div class="fleet-badges">
+          <span class="fleet-summary">3/3 PI STATIONS SYNCHRONIZED (NTP + REF PHASE LOCK)</span>
+          <span class="safety-badge" id="rf-safety-pill">✔ RF INPUT SAFE: -32.4 dBm (30 dB ATTENUATOR VERIFIED)</span>
+        </div>
+      </div>
+
+      <div class="fleet-cards-grid">
+        <!-- Station 1 Card (192.168.5.248 - RTL-SDR V3 R820T2) -->
+        <div class="station-card" id="card-station1">
+          <div class="card-header">
+            <div class="station-id">STATION 1 // ALPHA (192.168.5.248)</div>
+            <span class="status-pill online">ONLINE // V3 R820T2</span>
+          </div>
+          <div class="station-sub">Raspberry Pi 5 + RTL-SDR Blog V3 (TCXO 0.5 ppm) — Zero-Drop RAM Buffer</div>
+          <div class="station-metrics">
+            <div class="metric"><span class="m-lbl">CHRONY NTP SYNC</span><span class="m-val" id="st1-sync">+0.21
+                ms</span></div>
+            <div class="metric"><span class="m-lbl">CPU TEMP</span><span class="m-val" id="st1-temp">45.8 °C</span>
+            </div>
+            <div class="metric"><span class="m-lbl">RAM-DISK BUFFER</span><span class="m-val highlight"
+                id="st1-ram">/dev/shm ZERO-DROP</span></div>
+            <div class="metric"><span class="m-lbl">ADC CLIPPING</span><span class="m-val highlight"
+                id="st1-clip">0.012% (OK &lt;0.1%)</span></div>
+            <div class="metric"><span class="m-lbl">REF SNR / CFO</span><span class="m-val" id="st1-snr">26.4 dB / +0.42
+                ppm</span></div>
+            <div class="metric"><span class="m-lbl">CHROMATIC DELAY</span><span class="m-val cyan" id="st1-cal">0.00 ns
+                (REF)</span></div>
+          </div>
+        </div>
+
+        <!-- Station 2 Card (192.168.5.249 - RTL-SDR V3 R820T2) -->
+        <div class="station-card" id="card-station2">
+          <div class="card-header">
+            <div class="station-id">STATION 2 // BRAVO (192.168.5.249)</div>
+            <span class="status-pill online">ONLINE // V3 R820T2</span>
+          </div>
+          <div class="station-sub">Raspberry Pi 5 + RTL-SDR Blog V3 (TCXO 0.5 ppm) — Zero-Drop RAM Buffer</div>
+          <div class="station-metrics">
+            <div class="metric"><span class="m-lbl">CHRONY NTP SYNC</span><span class="m-val" id="st2-sync">+0.34
+                ms</span></div>
+            <div class="metric"><span class="m-lbl">CPU TEMP</span><span class="m-val" id="st2-temp">47.9 °C</span>
+            </div>
+            <div class="metric"><span class="m-lbl">RAM-DISK BUFFER</span><span class="m-val highlight"
+                id="st2-ram">/dev/shm ZERO-DROP</span></div>
+            <div class="metric"><span class="m-lbl">ADC CLIPPING</span><span class="m-val highlight"
+                id="st2-clip">0.018% (OK &lt;0.1%)</span></div>
+            <div class="metric"><span class="m-lbl">REF SNR / CFO</span><span class="m-val" id="st2-snr">25.8 dB / -0.65
+                ppm</span></div>
+            <div class="metric"><span class="m-lbl">CHROMATIC DELAY</span><span class="m-val cyan" id="st2-cal">0.00 ns
+                (V3)</span></div>
+          </div>
+        </div>
+
+        <!-- Station 3 Card (192.168.5.250 - RTL-SDR V4 R828D) -->
+        <div class="station-card station-v4" id="card-station3">
+          <div class="card-header">
+            <div class="station-id">STATION 3 // CHARLIE (192.168.5.250)</div>
+            <span class="status-pill v4-pill">ONLINE // V4 R828D</span>
+          </div>
+          <div class="station-sub">Raspberry Pi 5 + RTL-SDR Blog V4 (R828D Triplexer) — Chromatic Dispersion Calibrated
+          </div>
+          <div class="station-metrics">
+            <div class="metric"><span class="m-lbl">CHRONY NTP SYNC</span><span class="m-val" id="st3-sync">+0.16
+                ms</span></div>
+            <div class="metric"><span class="m-lbl">CPU TEMP</span><span class="m-val" id="st3-temp">50.2 °C</span>
+            </div>
+            <div class="metric"><span class="m-lbl">RAM-DISK BUFFER</span><span class="m-val highlight"
+                id="st3-ram">/dev/shm ZERO-DROP</span></div>
+            <div class="metric"><span class="m-lbl">ADC CLIPPING</span><span class="m-val highlight"
+                id="st3-clip">0.015% (OK &lt;0.1%)</span></div>
+            <div class="metric"><span class="m-lbl">REF SNR / CFO</span><span class="m-val" id="st3-snr">27.1 dB / +0.18
+                ppm</span></div>
+            <div class="metric"><span class="m-lbl">V4 GROUP DELAY</span><span class="m-val amber" id="st3-cal">+56.30
+                ns (V4 CAL)</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="radar.js"></script>
+  <script src="tactical_map.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
