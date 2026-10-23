@@ -1,0 +1,79 @@
+{
+  "status": "PASS",
+  "stations": {
+    "node1": [
+      0.0,
+      0.0
+    ],
+    "node2": [
+      8.0,
+      0.0
+    ],
+    "node3": [
+      4.6875,
+      3.7453095666446585
+    ]
+  },
+  "pluto": {
+    "xy": [
+      1.9985564181620727,
+      0.13659625639368742
+    ],
+    "residuals_m": {
+      "node1": 0.00321898299651302,
+      "node2": 0.0029978846609983734,
+      "node3": 0.000358801461268321
+    },
+    "rms_m": 0.0025480647860090188,
+    "max_abs_residual_m": 0.00321898299651302,
+    "consistency": "PASS",
+    "ambiguous": false
+  },
+  "triangle": {
+    "angles_deg": [
+      38.624832873052966,
+      48.509183144348185,
+      92.86598398259886
+    ],
+    "side": 1,
+    "mirror_note": "S3 placed at +Y; distances alone cannot tell the mirror image apart - choose to match the room"
+  },
+  "uncertainty": {
+    "sigma_tape_m": 0.02,
+    "assumption": "independent Gaussian tape-reading error per distance",
+    "n_samples": 25,
+    "seed": 12345,
+    "node3_std_m": [
+      0.01564262010927345,
+      0.01861554159930953
+    ],
+    "pluto_std_m": [
+      0.019401516619028853,
+      0.03433172984156099
+    ],
+    "pluto_radius95_m": 0.0661671485728968
+  },
+  "inputs_m": {
+    "S1-S2": 8.0,
+    "S1-S3": 6.0,
+    "S2-S3": 5.0,
+    "P-S1": 2.0,
+    "P-S2": 6.0,
+    "P-S3": 4.5
+  },
+  "warnings": [
+    "point is within 0.14 m of the line node1-node2 (poor geometry for TDOA)"
+  ],
+  "provenance": "TAPE_SURVEY (operator measurements, not independently verified)",
+  "inputs_raw": {
+    "S1-S2": 8.0,
+    "S1-S3": 6.0,
+    "S2-S3": 5.0,
+    "P-S1": 2.0,
+    "P-S2": 6.0,
+    "P-S3": 4.5
+  },
+  "schema_version": 1,
+  "name": "test_survey_run",
+  "saved_utc": "2026-10-22T17:32:00Z"
+}
